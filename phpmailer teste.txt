@@ -1,0 +1,50 @@
+<?php
+
+require_once('vendor/autoload.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;//USA O SMTP PARA ENVIO DE EMAILS
+use PHPMailer\PHPMailer\Exception;
+
+//recuperando as informações dadas pelo usuario no formualário
+$destinatario = $_POST['destinatario'];
+$assunto = $_POST['assunto'];
+$mensagem = $_POST['mensagem'];
+
+$mail = new PHPMailer(true); //true é para disparo de exception
+
+try{
+    $mail->SMTPDebug = SMTP::DEBUG_SERVER;//FAZ COM QUE O DEBUG VÁ PRINTANDO TUDO O QUE FOI FEITO NA TELA, SOMENTE PARA TESTE.
+    $mail->isSMTP();//faz a autenticação do remetente para depois enviar, mas pode ser usado apenas a função $mail->isMail();
+
+    //config pra se autenticar no SMTP
+
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'igorherediabr@gmail.com';
+    $mail->password = 'igor.brito08';
+   //$mail->SMTPSecure = PHPMailer::tls;//
+    $mail->Port = 587;
+
+    //info do remetente
+    $mail->setFrom('igorherediabr@gmail.com','Igor Brito');
+    $mail->addReplyTo('igorherediabr@gmail.com', 'Igor Brito');
+
+    //info do destinatario
+
+    $mail->addAddress($destinatario);
+
+    //configs do email
+    $mail->isHTML(true);//corpo da mensagem aceita html
+    $mail->Subject = utf8_decode($assunto);
+    $mail->Body = utf8_decode($mensagem . 
+        "<br /><br /><strong>Enviado via PHPMailer by Igor Brito.</strong>"
+    );
+
+    //envia o email
+    $mail->send();
+    echo 'Email enviado';
+}
+catch(Exception $e){
+    echo 'Erro ao enviar: ' . $e->getMessage();
+}
